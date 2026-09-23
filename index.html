@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Vortex Corp builds infrastructure for AI agents that act, execute and produce verifiable evidence.">
   <meta name="theme-color" content="#08090b">
-  <meta name="vortex-api-url" content="">
-  <meta name="vortex-api-execute-path" content="/api/vortex/execute">
-  <meta name="vortex-api-operation" content="inspect">
+  <meta name="vortex-runtime-repo" content="scoobiii/vuc">
+  <meta name="vortex-runtime-workflow" content="vortex-ci.yml">
   <title>Vortex Corp — Verifiable AI infrastructure</title>
   <style>
     :root{--bg:#08090b;--panel:#101216;--panel2:#15181e;--text:#f5f7fa;--muted:#9ba3af;--line:#262b34;--accent:#8ef0c5;--accent2:#79a7ff;--danger:#ff8f8f;--max:1160px}
@@ -82,22 +81,22 @@
 
   <section id="live">
     <div class="wrap">
-      <div class="section-head"><div class="kicker">Live API</div><h2>Realtime execution. Measured from the VUC response.</h2></div>
+      <div class="section-head"><div class="kicker">Live runtime</div><h2>Realtime execution. The runtime is GitHub Actions.</h2></div>
       <div class="live">
         <div class="live-panel">
-          <p class="lead">The page is static. The execution is not. The button below sends a real HTTP request to the private VUC API and renders only the response it receives.</p>
-          <div class="actions"><button id="run-one" class="btn primary" type="button">Run one execution</button><button id="run-benchmark" class="btn secondary" type="button">Benchmark 10 executions</button></div>
-          <p id="api-status" class="status" aria-live="polite">API endpoint not configured.</p>
-          <p class="api-note">The page never embeds credentials. Set <code>vortex-api-url</code> to the private VUC base URL reachable from the intranet (or leave it empty when an intranet reverse proxy exposes <code>/api/vortex/execute</code>). No execution result is generated locally.</p>
+          <p class="lead">The page is static. The runtime is not. VUA uses GitHub's API to drive execution in an ephemeral Actions sandbox; this page reads only public run state and links to the real execution surface.</p>
+          <div class="actions"><a id="run-one" class="btn primary" href="https://github.com/scoobiii/vuc/actions/workflows/vortex-ci.yml" target="_blank" rel="noopener">Open runtime</a><button id="run-benchmark" class="btn secondary" type="button">Refresh live evidence</button></div>
+          <p id="api-status" class="status" aria-live="polite">Loading GitHub Actions runtime…</p>
+          <p class="api-note">No VUC IP, private hostname, token or secret is embedded in GitHub Pages. Execution happens in GitHub Actions; the browser only reads the public Actions API.</p>
         </div>
         <div class="live-panel">
           <div class="live-grid">
-            <div class="metric"><span>Requests</span><strong id="m-requests">—</strong></div>
-            <div class="metric"><span>Verified</span><strong id="m-verified">—</strong></div>
-            <div class="metric"><span>p50</span><strong id="m-p50">—</strong></div>
-            <div class="metric"><span>p95</span><strong id="m-p95">—</strong></div>
-            <div class="metric"><span>p99</span><strong id="m-p99">—</strong></div>
-            <div class="metric"><span>Throughput</span><strong id="m-throughput">—</strong></div>
+            <div class="metric"><span>Observed runs</span><strong id="m-requests">—</strong></div>
+            <div class="metric"><span>Successful</span><strong id="m-verified">—</strong></div>
+            <div class="metric"><span>Run p50</span><strong id="m-p50">—</strong></div>
+            <div class="metric"><span>Run p95</span><strong id="m-p95">—</strong></div>
+            <div class="metric"><span>Run p99</span><strong id="m-p99">—</strong></div>
+            <div class="metric"><span>Latest</span><strong id="m-throughput">—</strong></div>
           </div>
           <pre id="proof-output" class="proofbox code">Waiting for a real API execution.</pre>
         </div>
@@ -132,100 +131,89 @@
 <script>
 (() => {
   "use strict";
-  const apiUrl = document.querySelector('meta[name="vortex-api-url"]')?.content.trim() || "";
-  const executePath = document.querySelector('meta[name="vortex-api-execute-path"]')?.content.trim() || "/api/vortex/execute";
-  const operation = document.querySelector('meta[name="vortex-api-operation"]')?.content.trim() || "inspect";
-  const $ = (id) => document.getElementById(id);
+  const repo = document.querySelector('meta[name="vortex-runtime-repo"]')?.content.trim() || "scoobiii/vuc";
+  const workflow = document.querySelector('meta[name="vortex-runtime-workflow"]')?.content.trim() || "vortex-ci.yml";
+  const api = "https://api.github.com/repos/" + repo;
+  const $ = id => document.getElementById(id);
+  const metric = (id, value) => $(id).textContent = value;
   const status = $("api-status");
   const proof = $("proof-output");
-  const metric = (id, value) => $(id).textContent = value;
 
-  function requestPayload() {
-    return {
-      request_id: "vortexcorp-" + crypto.randomUUID(),
-      operation,
-      target: { repository: "scoobiii/VortexCorp" },
-      input: { repository: "scoobiii/VortexCorp" }
-    };
-  }
-
-  async function invoke() {
-    const endpoint = (apiUrl ? apiUrl.replace(/\/$/, "") : "") + executePath;
-    const started = performance.now();
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(requestPayload())
+  async function getJson(path) {
+    const response = await fetch(api + path, {
+      headers: { "accept": "application/vnd.github+json" },
+      cache: "no-store"
     });
-    const elapsed = performance.now() - started;
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body?.error?.message || ("HTTP " + response.status));
-    return { body, elapsed };
+    if (!response.ok) throw new Error(body.message || ("GitHub API HTTP " + response.status));
+    return body;
   }
 
-  function percentile(values, p) {
-    const sorted = [...values].sort((a,b) => a-b);
-    if (!sorted.length) return NaN;
-    const index = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
-    return sorted[index];
+  function duration(run) {
+    if (!run?.run_started_at || !run?.updated_at) return null;
+    return Math.max(0, new Date(run.updated_at) - new Date(run.run_started_at));
   }
 
-  async function runOne() {
+  async function refresh() {
     status.className = "status";
-    status.textContent = "Executing through Vortex API…";
-    proof.textContent = "Waiting for response…";
+    status.textContent = "Reading GitHub Actions runtime…";
     try {
-      const result = await invoke();
-      const body = result.body;
-      metric("m-requests", "1");
-      metric("m-verified", body.execution_proof?.executed ? "1" : "0");
-      metric("m-p50", Math.round(result.elapsed) + " ms");
-      metric("m-p95", Math.round(result.elapsed) + " ms");
-      metric("m-p99", Math.round(result.elapsed) + " ms");
-      metric("m-throughput", "1 / " + Math.max(1, Math.round(result.elapsed)) + " ms");
-      proof.textContent = JSON.stringify(body, null, 2);
-      status.textContent = "Execution returned by Vortex API in " + Math.round(result.elapsed) + " ms.";
+      const [runs, workflowInfo, artifacts] = await Promise.all([
+        getJson("/actions/runs?per_page=10"),
+        getJson("/actions/workflows/" + encodeURIComponent(workflow)),
+        getJson("/actions/artifacts?per_page=20")
+      ]);
+      const relevant = (runs.workflow_runs || []).filter(r => r.path === ".github/workflows/" + workflow || r.name === workflowInfo.name);
+      const list = relevant.length ? relevant : (runs.workflow_runs || []);
+      const latest = list[0];
+      if (!latest) throw new Error("No GitHub Actions execution found.");
+      const durations = list.map(duration).filter(v => v !== null);
+      const successCount = list.filter(r => r.conclusion === "success").length;
+      const evidence = (artifacts.artifacts || []).find(a => a.name === "vortex-execution-evidence" && !a.expired);
+      metric("m-requests", String(list.length));
+      metric("m-verified", successCount + "/" + list.length);
+      metric("m-p50", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.floor((durations.length-1)*.5)]) + " ms" : "—");
+      metric("m-p95", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.min(durations.length-1,Math.ceil(durations.length*.95)-1)]) + " ms" : "—");
+      metric("m-p99", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.min(durations.length-1,Math.ceil(durations.length*.99)-1)]) + " ms" : "—");
+      metric("m-throughput", latest.status === "completed" ? latest.conclusion || "completed" : latest.status);
+      proof.textContent = JSON.stringify({
+        runtime: "github-actions-sandbox",
+        workflow: workflowInfo.name,
+        evidence_artifact: evidence ? {
+          id: evidence.id,
+          name: evidence.name,
+          size_in_bytes: evidence.size_in_bytes,
+          created_at: evidence.created_at,
+          expires_at: evidence.expires_at
+        } : null,
+        latest_execution: {
+          id: latest.id,
+          status: latest.status,
+          conclusion: latest.conclusion,
+          event: latest.event,
+          sha: latest.head_sha,
+          started_at: latest.run_started_at,
+          updated_at: latest.updated_at,
+          html_url: latest.html_url
+        },
+        evidence_url: evidence ? "https://github.com/" + repo + "/actions/runs/" + latest.id : null,
+        observed_runs: list.map(r => ({
+          id: r.id, status: r.status, conclusion: r.conclusion,
+          event: r.event, sha: r.head_sha, created_at: r.created_at,
+          updated_at: r.updated_at, html_url: r.html_url
+        }))
+      }, null, 2);
+      status.textContent = "Live runtime read: " + latest.status + (latest.conclusion ? " / " + latest.conclusion : "") + ".";
     } catch (error) {
       status.className = "status error";
       status.textContent = error instanceof Error ? error.message : String(error);
-      proof.textContent = "No execution result received.";
+      proof.textContent = "No live runtime evidence received.";
       ["m-requests","m-verified","m-p50","m-p95","m-p99","m-throughput"].forEach(id => metric(id, "—"));
     }
   }
 
-  async function benchmark() {
-    status.className = "status";
-    status.textContent = "Running 10 real VUC executions…";
-    proof.textContent = "Benchmark in progress…";
-    const values = [];
-    let verified = 0;
-    let lastBody = null;
-    try {
-      for (let i = 0; i < 10; i++) {
-        const result = await invoke();
-        values.push(result.elapsed);
-        lastBody = result.body;
-        if (result.body?.execution_proof?.executed) verified++;
-        status.textContent = "Running 10 real VUC executions… " + (i + 1) + "/10";
-      }
-      const total = values.reduce((a,b) => a+b, 0);
-      metric("m-requests", String(values.length));
-      metric("m-verified", verified + "/" + values.length);
-      metric("m-p50", Math.round(percentile(values, 50)) + " ms");
-      metric("m-p95", Math.round(percentile(values, 95)) + " ms");
-      metric("m-p99", Math.round(percentile(values, 99)) + " ms");
-      metric("m-throughput", (values.length / (total / 1000)).toFixed(2) + " req/s");
-      proof.textContent = JSON.stringify({ benchmark: { requests: values.length, verified, latency_ms: values }, last_execution: lastBody }, null, 2);
-      status.textContent = "Benchmark complete: " + verified + "/" + values.length + " executions returned with ExecutionProof.";
-    } catch (error) {
-      status.className = "status error";
-      status.textContent = error instanceof Error ? error.message : String(error);
-      proof.textContent = "Benchmark stopped because the API did not return a successful execution.";
-    }
-  }
-
-  $("run-one").addEventListener("click", runOne);
-  $("run-benchmark").addEventListener("click", benchmark);
+  $("run-benchmark").addEventListener("click", refresh);
+  refresh();
 })();
 </script>
 </body>
