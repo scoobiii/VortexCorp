@@ -91,12 +91,12 @@
         </div>
         <div class="live-panel">
           <div class="live-grid">
-            <div class="metric"><span>Requests</span><strong id="m-requests">—</strong></div>
-            <div class="metric"><span>Verified</span><strong id="m-verified">—</strong></div>
-            <div class="metric"><span>p50</span><strong id="m-p50">—</strong></div>
-            <div class="metric"><span>p95</span><strong id="m-p95">—</strong></div>
-            <div class="metric"><span>p99</span><strong id="m-p99">—</strong></div>
-            <div class="metric"><span>Throughput</span><strong id="m-throughput">—</strong></div>
+            <div class="metric"><span>Observed runs</span><strong id="m-requests">—</strong></div>
+            <div class="metric"><span>Successful</span><strong id="m-verified">—</strong></div>
+            <div class="metric"><span>Run p50</span><strong id="m-p50">—</strong></div>
+            <div class="metric"><span>Run p95</span><strong id="m-p95">—</strong></div>
+            <div class="metric"><span>Run p99</span><strong id="m-p99">—</strong></div>
+            <div class="metric"><span>Latest</span><strong id="m-throughput">—</strong></div>
           </div>
           <pre id="proof-output" class="proofbox code">Waiting for a real API execution.</pre>
         </div>
@@ -158,9 +158,10 @@
     status.className = "status";
     status.textContent = "Reading GitHub Actions runtime…";
     try {
-      const [runs, workflowInfo] = await Promise.all([
+      const [runs, workflowInfo, artifacts] = await Promise.all([
         getJson("/actions/runs?per_page=10"),
-        getJson("/actions/workflows/" + encodeURIComponent(workflow))
+        getJson("/actions/workflows/" + encodeURIComponent(workflow)),
+        getJson("/actions/artifacts?per_page=20")
       ]);
       const relevant = (runs.workflow_runs || []).filter(r => r.path === ".github/workflows/" + workflow || r.name === workflowInfo.name);
       const list = relevant.length ? relevant : (runs.workflow_runs || []);
@@ -168,6 +169,7 @@
       if (!latest) throw new Error("No GitHub Actions execution found.");
       const durations = list.map(duration).filter(v => v !== null);
       const successCount = list.filter(r => r.conclusion === "success").length;
+      const evidence = (artifacts.artifacts || []).find(a => a.name === "vortex-execution-evidence" && !a.expired);
       metric("m-requests", String(list.length));
       metric("m-verified", successCount + "/" + list.length);
       metric("m-p50", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.floor((durations.length-1)*.5)]) + " ms" : "—");
@@ -177,6 +179,13 @@
       proof.textContent = JSON.stringify({
         runtime: "github-actions-sandbox",
         workflow: workflowInfo.name,
+        evidence_artifact: evidence ? {
+          id: evidence.id,
+          name: evidence.name,
+          size_in_bytes: evidence.size_in_bytes,
+          created_at: evidence.created_at,
+          expires_at: evidence.expires_at
+        } : null,
         latest_execution: {
           id: latest.id,
           status: latest.status,
@@ -187,6 +196,7 @@
           updated_at: latest.updated_at,
           html_url: latest.html_url
         },
+        evidence_url: evidence ? "https://github.com/" + repo + "/actions/runs/" + latest.id : null,
         observed_runs: list.map(r => ({
           id: r.id, status: r.status, conclusion: r.conclusion,
           event: r.event, sha: r.head_sha, created_at: r.created_at,
