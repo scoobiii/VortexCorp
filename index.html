@@ -26,11 +26,11 @@
     .markets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.market{border:1px solid var(--line);border-radius:12px;padding:15px;color:var(--muted);background:var(--panel)}.market strong{display:block;color:var(--text);font-size:.95rem}
     .proof{display:grid;gap:14px}.proofbox{border:1px solid var(--line);border-radius:16px;padding:22px;background:#0c0e12;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:#cbd2dc;overflow:auto}.ok{color:var(--accent)}
     .live{display:grid;gap:16px}.live-panel{border:1px solid var(--line);border-radius:16px;background:#0c0e12;padding:20px}.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.metric{border:1px solid var(--line);border-radius:10px;padding:12px}.metric span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.metric strong{font:700 1rem ui-monospace,SFMono-Regular,Menlo,monospace}.status{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem}.error{color:var(--danger)}.api-note{color:var(--muted);font-size:.82rem}
-    .code{white-space:pre-wrap;word-break:break-word}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+    .drex-visual{position:relative;min-height:500px;border:1px solid var(--line);border-radius:22px;background:radial-gradient(circle at 50% 50%,rgba(121,167,255,.10),transparent 38%),#090b0f;overflow:hidden;margin-bottom:14px}.drex-core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:150px;height:150px;border:1px solid rgba(142,240,197,.6);border-radius:50%;display:grid;place-items:center;align-content:center;text-align:center;background:rgba(8,9,11,.92);z-index:3;box-shadow:0 0 60px rgba(142,240,197,.10)}.drex-core strong{font-size:1.35rem;letter-spacing:.08em}.drex-core span{font-size:.65rem;color:var(--muted);max-width:90px}.drex-orbit{position:absolute;inset:-28px;border:1px solid rgba(121,167,255,.18);border-radius:50%;animation:spin 12s linear infinite}.orbit-b{inset:-62px;border-color:rgba(142,240,197,.12);animation-duration:19s;animation-direction:reverse}.layer{position:absolute;display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(16,18,22,.88);font:11px ui-monospace,SFMono-Regular,Menlo,monospace;min-width:135px;animation:pulse 3s ease-in-out infinite}.layer b{font-size:10px;color:var(--text)}.layer span{color:var(--muted)}.layer em{font-style:normal;color:var(--accent);font-weight:800}.layer-1{left:5%;top:10%}.layer-2{right:5%;top:18%;animation-delay:.4s}.layer-3{left:4%;bottom:17%;animation-delay:.8s}.layer-4{right:5%;bottom:12%;animation-delay:1.2s}.layer-5{left:50%;top:7%;transform:translateX(-50%);animation-delay:1.6s}.drex-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.drex-metrics .metric{background:var(--panel)}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:translateY(-3px);border-color:#394250}}.code{white-space:pre-wrap;word-break:break-word}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
     footer{padding:38px 0;color:var(--muted);font-size:.85rem}.footerrow{display:flex;flex-direction:column;gap:14px}
     :focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
-    @media (min-width:700px){.wrap{width:min(calc(100% - 48px),var(--max))}.navlinks{display:flex}.menu{display:none}.hero{padding:120px 0 110px}.grid{grid-template-columns:repeat(3,1fr)}.proof{grid-template-columns:1fr 1fr}.live{grid-template-columns:1.1fr .9fr}.markets{grid-template-columns:repeat(4,1fr)}.footerrow{flex-direction:row;justify-content:space-between;align-items:center}}
-    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media (min-width:700px){.drex-metrics{grid-template-columns:repeat(6,1fr)}.wrap{width:min(calc(100% - 48px),var(--max))}.navlinks{display:flex}.menu{display:none}.hero{padding:120px 0 110px}.grid{grid-template-columns:repeat(3,1fr)}.proof{grid-template-columns:1fr 1fr}.live{grid-template-columns:1.1fr .9fr}.markets{grid-template-columns:repeat(4,1fr)}.footerrow{flex-direction:row;justify-content:space-between;align-items:center}}
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.drex-orbit,.layer{animation:none}}
   </style>
 </head>
 <body>
@@ -38,7 +38,7 @@
   <nav class="wrap" aria-label="Primary">
     <a class="brand" href="#" aria-label="Vortex Corp home">VORTEX<span>.</span></a>
     <div class="navlinks">
-      <a href="#platform">Platform</a><a href="#markets">Markets</a><a href="#live">Live API</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a>
+      <a href="#platform">Platform</a><a href="#markets">Markets</a><a href="#drex">Drex</a><a href="#live">Live API</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a>
     </div>
     <button class="menu" type="button" aria-label="Navigation menu">Menu</button>
   </nav>
@@ -77,6 +77,33 @@
         <article class="card"><span class="tag">02 / VUA</span><h3>Call systems through APIs</h3><p>VUA provides the invocation layer for adapters, repositories and external execution surfaces.</p></article>
         <article class="card"><span class="tag">03 / Proof</span><h3>Leave evidence</h3><p>ExecutionProof makes an action inspectable and independently verifiable rather than merely asserted.</p></article>
       </div>
+    </div>
+  </section>
+
+
+  <section id="drex">
+    <div class="wrap">
+      <div class="section-head"><div class="kicker">Financial Services / Public Sector</div><h2>Drex as a live governance surface.</h2><p class="lead">A Vortex agent can observe a regulated digital workflow through VUA, measure the execution path and return evidence. The visualization below is fed by the same live API benchmark — no values are prefilled.</p></div>
+      <div class="drex-visual" role="img" aria-label="Animated conceptual view of Drex governance layers">
+        <div class="drex-core">
+          <div class="drex-orbit orbit-a"></div><div class="drex-orbit orbit-b"></div>
+          <strong>DREX</strong><span>digital asset infrastructure</span>
+        </div>
+        <div class="layer layer-1"><b>01 · Access</b><span>VUA invocation</span><em id="drex-access">—</em></div>
+        <div class="layer layer-2"><b>02 · Security</b><span>transport / policy</span><em id="drex-security">—</em></div>
+        <div class="layer layer-3"><b>03 · Execution</b><span>real API operation</span><em id="drex-execution">—</em></div>
+        <div class="layer layer-4"><b>04 · Verification</b><span>ExecutionProof</span><em id="drex-verification">—</em></div>
+        <div class="layer layer-5"><b>05 · Evidence</b><span>hash / timestamps</span><em id="drex-evidence">—</em></div>
+      </div>
+      <div class="drex-metrics">
+        <div class="metric"><span>Latency p50</span><strong id="drex-p50">—</strong></div>
+        <div class="metric"><span>Latency p95</span><strong id="drex-p95">—</strong></div>
+        <div class="metric"><span>Verification rate</span><strong id="drex-verify-rate">—</strong></div>
+        <div class="metric"><span>Contract accuracy</span><strong id="drex-accuracy">—</strong></div>
+        <div class="metric"><span>Security posture</span><strong id="drex-security-rate">—</strong></div>
+        <div class="metric"><span>Market rating</span><strong id="drex-rating">N/A</strong></div>
+      </div>
+      <p class="api-note">Performance metrics are measured from actual API responses. “Contract accuracy” means successful conformance to the declared execution/proof contract; it is not a claim of financial or semantic accuracy. “Market rating” is intentionally N/A until an external, attributable rating source is connected.</p>
     </div>
   </section>
 
@@ -171,6 +198,22 @@
     return sorted[index];
   }
 
+  function updateDrexMetrics({p50, p95, verified, requests, lastBody}) {
+    const rate = requests ? (verified / requests) * 100 : 0;
+    const contractOk = lastBody?.proof?.executed === true && typeof lastBody?.proof?.request_id === "string";
+    $("drex-p50").textContent = Math.round(p50) + " ms";
+    $("drex-p95").textContent = Math.round(p95) + " ms";
+    $("drex-verify-rate").textContent = verified + "/" + requests + " (" + rate.toFixed(1) + "%)";
+    $("drex-accuracy").textContent = contractOk ? "100% contract" : "not verified";
+    $("drex-security-rate").textContent = apiUrl.startsWith("https://") ? "TLS / HTTPS" : "not verified";
+    $("drex-rating").textContent = "N/A";
+    $("drex-access").textContent = "LIVE";
+    $("drex-security").textContent = apiUrl.startsWith("https://") ? "HTTPS" : "CHECK";
+    $("drex-execution").textContent = lastBody?.status === "success" ? "SUCCESS" : "CHECK";
+    $("drex-verification").textContent = lastBody?.proof?.executed ? "VALID" : "CHECK";
+    $("drex-evidence").textContent = lastBody?.proof?.output_hash ? "HASHED" : "CHECK";
+  }
+
   async function runOne() {
     status.className = "status";
     status.textContent = "Executing through Vortex API…";
@@ -184,6 +227,7 @@
       metric("m-p95", Math.round(result.elapsed) + " ms");
       metric("m-p99", Math.round(result.elapsed) + " ms");
       metric("m-throughput", "1 / " + Math.max(1, Math.round(result.elapsed)) + " ms");
+      updateDrexMetrics({p50: result.elapsed, p95: result.elapsed, verified: body.proof?.executed ? 1 : 0, requests: 1, lastBody: body});
       proof.textContent = JSON.stringify(body, null, 2);
       status.textContent = "Execution returned by Vortex API in " + Math.round(result.elapsed) + " ms.";
     } catch (error) {
@@ -215,7 +259,10 @@
       metric("m-p50", Math.round(percentile(values, 50)) + " ms");
       metric("m-p95", Math.round(percentile(values, 95)) + " ms");
       metric("m-p99", Math.round(percentile(values, 99)) + " ms");
+      const p50 = percentile(values, 50);
+      const p95 = percentile(values, 95);
       metric("m-throughput", (values.length / (total / 1000)).toFixed(2) + " req/s");
+      updateDrexMetrics({p50, p95, verified, requests: values.length, lastBody});
       proof.textContent = JSON.stringify({ benchmark: { requests: values.length, verified, latency_ms: values }, last_execution: lastBody }, null, 2);
       status.textContent = "Benchmark complete: " + verified + "/" + values.length + " executions verified by the API.";
     } catch (error) {
