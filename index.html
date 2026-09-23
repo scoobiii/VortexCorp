@@ -206,7 +206,7 @@
         values.push(result.elapsed);
         lastBody = result.body;
         if (result.body?.execution_proof?.executed) verified++;
-        status.textContent = "Running 10 real API calls… " + (i + 1) + "/10";
+        status.textContent = "Running 10 real VUC executions… " + (i + 1) + "/10";
       }
       const total = values.reduce((a,b) => a+b, 0);
       metric("m-requests", String(values.length));
@@ -216,7 +216,7 @@
       metric("m-p99", Math.round(percentile(values, 99)) + " ms");
       metric("m-throughput", (values.length / (total / 1000)).toFixed(2) + " req/s");
       proof.textContent = JSON.stringify({ benchmark: { requests: values.length, verified, latency_ms: values }, last_execution: lastBody }, null, 2);
-      status.textContent = "Benchmark complete: " + verified + "/" + values.length + " executions returned with ExecutionProof.;
+      status.textContent = "Benchmark complete: " + verified + "/" + values.length + " executions returned with ExecutionProof.";
     } catch (error) {
       status.className = "status error";
       status.textContent = error instanceof Error ? error.message : String(error);
