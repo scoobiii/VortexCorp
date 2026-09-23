@@ -22,7 +22,7 @@
     .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid var(--line);font-weight:700;cursor:pointer}.primary{background:var(--text);color:#090a0c;border-color:var(--text)}.secondary{background:transparent}
     section{padding:72px 0;border-top:1px solid var(--line)}.section-head{display:grid;gap:10px;margin-bottom:28px}.kicker{color:var(--accent2);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h2{font-size:clamp(2rem,7vw,3.7rem);line-height:1.02;letter-spacing:-.045em;margin:0}p{margin:0}
     .grid{display:grid;grid-template-columns:1fr;gap:14px}.card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:24px}.card h3{margin:0 0 8px;font-size:1.15rem}.card p{color:var(--muted);font-size:.95rem}.tag{display:inline-block;margin-bottom:32px;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
-    .markets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.market{border:1px solid var(--line);border-radius:12px;padding:15px;color:var(--muted);background:var(--panel)}.market strong{display:block;color:var(--text);font-size:.95rem}
+    .markets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.market{border:1px solid var(--line);border-radius:12px;padding:15px;color:var(--muted);background:var(--panel);transition:transform .18s ease,border-color .18s ease}.market:hover{transform:translateY(-2px);border-color:#46505f}.market strong{display:block;color:var(--text);font-size:.95rem}.market small{display:block;margin-top:8px;color:#747e8c;font-size:.76rem;line-height:1.45}.industry-node{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.node-list{margin:12px 0 0;padding-left:17px;color:var(--muted);font-size:.82rem;line-height:1.5}.node-list a{color:#cbd2dc}.node-list a:hover,.node-list a:focus-visible{color:var(--accent)}.network-note{margin-top:16px;color:var(--muted);font-size:.82rem}.market-graph{margin-bottom:14px}.graph-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:var(--text);font-size:.82rem}.graph-flow span{border:1px solid var(--line);border-radius:999px;padding:8px 10px;background:var(--panel)}.graph-flow b{color:var(--accent);font-weight:700}.portfolio-bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.pill{border:1px solid var(--line);border-radius:999px;padding:7px 10px;color:var(--muted);font-size:.75rem;background:var(--panel)}
     .proof{display:grid;gap:14px}.proofbox{border:1px solid var(--line);border-radius:16px;padding:22px;background:#0c0e12;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:#cbd2dc;overflow:auto}.ok{color:var(--accent)}
     .live{display:grid;gap:16px}.live-panel{border:1px solid var(--line);border-radius:16px;background:#0c0e12;padding:20px}.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.metric{border:1px solid var(--line);border-radius:10px;padding:12px}.metric span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.metric strong{font:700 1rem ui-monospace,SFMono-Regular,Menlo,monospace}.status{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem}.error{color:var(--danger)}.api-note{color:var(--muted);font-size:.82rem}
     .code{white-space:pre-wrap;word-break:break-word}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
@@ -37,7 +37,7 @@
   <nav class="wrap" aria-label="Primary">
     <a class="brand" href="#" aria-label="Vortex Corp home">VORTEX<span>.</span></a>
     <div class="navlinks">
-      <a href="#platform">Platform</a><a href="#markets">Markets</a><a href="#live">Live API</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a>
+      <a href="#platform">Platform</a><a href="#markets">Industries</a><a href="#live">Live</a><a href="#networks">Networks</a><a href="#live">Live Runtime</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a>
     </div>
     <button class="menu" type="button" aria-label="Navigation menu">Menu</button>
   </nav>
@@ -54,16 +54,49 @@
 
   <section id="markets">
     <div class="wrap">
-      <div class="section-head"><div class="kicker">Markets</div><h2>Agent execution for real operations.</h2></div>
+      <div class="section-head">
+        <div class="kicker">Market graph</div>
+        <h2>Every repository is a dynamic sector-market representation.</h2>
+        <p class="lead">A repository is not locked to one industry. Its market representation can span sectors, segments and capabilities, with VUA as the governance layer connecting software nodes to executable networks.</p>
+      </div>
+      <div class="card market-graph">
+        <div class="graph-flow" aria-label="Dynamic market graph">
+          <span>Repository node</span><b>→</b><span>Capability</span><b>→</b><span>Market segment</span><b>→</b><span>VUA governance node</span><b>→</b><span>Network</span>
+        </div>
+        <p class="network-note">One repository may participate in multiple market projections. The classification is a navigational model, not a claim of production deployment or current DREX membership.</p>
+      </div>
       <div class="markets">
-        <div class="market"><strong>Financial Services</strong>banking, ERP, compliance</div>
-        <div class="market"><strong>Energy & Utilities</strong>CCEE, ERP, SCADA, billing</div>
-        <div class="market"><strong>Retail & Consumer</strong>inventory, pricing, supply chain</div>
-        <div class="market"><strong>Manufacturing</strong>operations, quality, maintenance</div>
-        <div class="market"><strong>Logistics</strong>orders, routing, fulfillment</div>
-        <div class="market"><strong>Healthcare</strong>workflow and governed systems</div>
-        <div class="market"><strong>Technology</strong>repositories, cloud, APIs</div>
-        <div class="market"><strong>Public Sector</strong>controlled digital operations</div>
+        <article class="market"><div class="industry-node"><strong>Financial Services</strong><span class="pill">finance / segments</span></div><small>payments · digital assets · financial infrastructure</small><ul class="node-list"><li><a href="https://github.com/scoobiii/PLIMM-Bank" target="_blank" rel="noopener">PLIMM-Bank</a></li><li><a href="https://github.com/scoobiii/real-digital-smart-contracts" target="_blank" rel="noopener">real-digital-smart-contracts</a></li><li><a href="https://github.com/scoobiii/realtime-credit-validator" target="_blank" rel="noopener">realtime-credit-validator</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Energy & Utilities</strong><span class="pill">energy / segments</span></div><small>solar · BESS · grid · metering · energy finance</small><ul class="node-list"><li><a href="https://github.com/scoobiii/MEX-intelig-ncIA" target="_blank" rel="noopener">MEX-intelig-ncIA</a></li><li><a href="https://github.com/scoobiii/SmartMeters" target="_blank" rel="noopener">SmartMeters</a></li><li><a href="https://github.com/scoobiii/ONS_Dados_Abertos" target="_blank" rel="noopener">ONS_Dados_Abertos</a></li><li><a href="https://github.com/scoobiii/SolarCalc" target="_blank" rel="noopener">SolarCalc</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Retail & Consumer</strong><span class="pill">commerce</span></div><small>market intelligence · commerce · customer systems</small><ul class="node-list"><li><a href="https://github.com/scoobiii/MarketMap" target="_blank" rel="noopener">MarketMap</a></li><li><a href="https://github.com/scoobiii/coin360-frontend" target="_blank" rel="noopener">coin360-frontend</a></li><li><a href="https://github.com/scoobiii/coin360-backend" target="_blank" rel="noopener">coin360-backend</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Manufacturing</strong><span class="pill">industrial</span></div><small>industrial control · sensors · automation</small><ul class="node-list"><li><a href="https://github.com/scoobiii/stl2ngc" target="_blank" rel="noopener">stl2ngc</a></li><li><a href="https://github.com/scoobiii/iot-controller" target="_blank" rel="noopener">iot-controller</a></li><li><a href="https://github.com/scoobiii/TempControl" target="_blank" rel="noopener">TempControl</a></li><li><a href="https://github.com/scoobiii/BME680" target="_blank" rel="noopener">BME680</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Logistics</strong><span class="pill">mobility</span></div><small>routing · location · distributed workflows</small><ul class="node-list"><li><a href="https://github.com/scoobiii/uber_clone" target="_blank" rel="noopener">uber_clone</a></li><li><a href="https://github.com/scoobiii/here-data-sdk-cpp" target="_blank" rel="noopener">here-data-sdk-cpp</a></li><li><a href="https://github.com/scoobiii/logiQ" target="_blank" rel="noopener">logiQ</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Healthcare</strong><span class="pill">health</span></div><small>medical data · imaging · genomics</small><ul class="node-list"><li><a href="https://github.com/scoobiii/dicom-anonymizer" target="_blank" rel="noopener">dicom-anonymizer</a></li><li><a href="https://github.com/scoobiii/Medical-Blockchain" target="_blank" rel="noopener">Medical-Blockchain</a></li><li><a href="https://github.com/scoobiii/ecg-mit-bih" target="_blank" rel="noopener">ecg-mit-bih</a></li><li><a href="https://github.com/scoobiii/aws-genomics-workflows" target="_blank" rel="noopener">aws-genomics-workflows</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Technology</strong><span class="pill">platform / segments</span></div><small>AI agents · governance · runtime · developer systems</small><ul class="node-list"><li><a href="https://github.com/scoobiii/vua" target="_blank" rel="noopener">vua</a></li><li><a href="https://github.com/scoobiii/vuc" target="_blank" rel="noopener">vuc</a></li><li><a href="https://github.com/scoobiii/vortex" target="_blank" rel="noopener">vortex</a></li><li><a href="https://github.com/scoobiii/opensre" target="_blank" rel="noopener">opensre</a></li><li><a href="https://github.com/scoobiii/Bend" target="_blank" rel="noopener">Bend</a></li></ul></article>
+        <article class="market"><div class="industry-node"><strong>Public Sector</strong><span class="pill">civic tech</span></div><small>transparency · legislation · public data</small><ul class="node-list"><li><a href="https://github.com/scoobiii/legisla-laravel" target="_blank" rel="noopener">legisla-laravel</a></li><li><a href="https://github.com/scoobiii/mcp-portal-transparencia" target="_blank" rel="noopener">mcp-portal-transparencia</a></li><li><a href="https://github.com/scoobiii/geosampa-iptu" target="_blank" rel="noopener">geosampa-iptu</a></li><li><a href="https://github.com/scoobiii/new-wikilegis" target="_blank" rel="noopener">new-wikilegis</a></li></ul></article>
+      </div>
+      <div class="portfolio-bar">
+        <span class="pill">400+ software ecosystem nodes</span>
+        <span class="pill">Repository → capability → market segment</span>
+        <span class="pill">VUA governance layer</span>
+        <span class="pill">GitHub Actions runtime</span>
+      </div>
+      <p class="network-note"><strong>DREX is modeled separately as a network.</strong> The Phase 1 pilot report documents 26 Besu nodes: 10 operated by BCB and 16 by participants. The VortexCorp UI should not reuse that number as a current Phase 2 network count.</p>
+    </div>
+  </section>
+
+  <section id="networks">
+    <div class="wrap">
+      <div class="section-head"><div class="kicker">Networks</div><h2>DREX is a network view, not an industry card.</h2></div>
+      <div class="card">
+        <span class="tag">DREX / Phase 1 documented topology</span>
+        <div class="markets">
+          <div class="market"><strong>10 BCB nodes</strong>6 validator nodes + 4 JSON-RPC nodes</div>
+          <div class="market"><strong>16 participant nodes</strong>participant-operated Besu nodes</div>
+          <div class="market"><strong>26 documented nodes</strong>Phase 1 pilot topology</div>
+          <div class="market"><strong>Network layer</strong>RSFN-connected permissioned network</div>
+        </div>
+        <p class="network-note">This is a documented Phase 1 topology, not a claim about the current or future Phase 2 node count.</p>
       </div>
     </div>
   </section>
