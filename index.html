@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Vortex Corp builds infrastructure for AI agents that act, execute and produce verifiable evidence.">
   <meta name="theme-color" content="#08090b">
+  <meta name="vortex-api-url" content="">
+  <meta name="vortex-api-connector" content="">
+  <meta name="vortex-api-operation" content="">
   <title>Vortex Corp — Verifiable AI infrastructure</title>
   <style>
-    :root{--bg:#08090b;--panel:#101216;--panel2:#15181e;--text:#f5f7fa;--muted:#9ba3af;--line:#262b34;--accent:#8ef0c5;--accent2:#79a7ff;--max:1160px}
+    :root{--bg:#08090b;--panel:#101216;--panel2:#15181e;--text:#f5f7fa;--muted:#9ba3af;--line:#262b34;--accent:#8ef0c5;--accent2:#79a7ff;--danger:#ff8f8f;--max:1160px}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
     a{color:inherit;text-decoration:none}.wrap{width:min(calc(100% - 32px),var(--max));margin:auto}
     header{position:sticky;top:0;z-index:10;background:rgba(8,9,11,.82);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.07)}
@@ -17,13 +20,16 @@
     main{overflow:hidden}.hero{padding:76px 0 72px;position:relative}.hero:before{content:"";position:absolute;width:480px;height:480px;right:-280px;top:-160px;border-radius:50%;background:radial-gradient(circle,rgba(121,167,255,.18),transparent 68%);pointer-events:none}
     .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:.78rem;font-weight:750;letter-spacing:.13em;text-transform:uppercase}.dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
     h1{font-size:clamp(3rem,12vw,6.8rem);line-height:.94;letter-spacing:-.065em;max-width:950px;margin:20px 0 24px}.lead{max-width:720px;color:var(--muted);font-size:clamp(1.05rem,2vw,1.3rem)}
-    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid var(--line);font-weight:700}.primary{background:var(--text);color:#090a0c;border-color:var(--text)}.secondary{background:transparent}
+    .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid var(--line);font-weight:700;cursor:pointer}.primary{background:var(--text);color:#090a0c;border-color:var(--text)}.secondary{background:transparent}
     section{padding:72px 0;border-top:1px solid var(--line)}.section-head{display:grid;gap:10px;margin-bottom:28px}.kicker{color:var(--accent2);font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}h2{font-size:clamp(2rem,7vw,3.7rem);line-height:1.02;letter-spacing:-.045em;margin:0}p{margin:0}
     .grid{display:grid;grid-template-columns:1fr;gap:14px}.card{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:16px;padding:24px}.card h3{margin:0 0 8px;font-size:1.15rem}.card p{color:var(--muted);font-size:.95rem}.tag{display:inline-block;margin-bottom:32px;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em}
+    .markets{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.market{border:1px solid var(--line);border-radius:12px;padding:15px;color:var(--muted);background:var(--panel)}.market strong{display:block;color:var(--text);font-size:.95rem}
     .proof{display:grid;gap:14px}.proofbox{border:1px solid var(--line);border-radius:16px;padding:22px;background:#0c0e12;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem;color:#cbd2dc;overflow:auto}.ok{color:var(--accent)}
+    .live{display:grid;gap:16px}.live-panel{border:1px solid var(--line);border-radius:16px;background:#0c0e12;padding:20px}.live-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.metric{border:1px solid var(--line);border-radius:10px;padding:12px}.metric span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.metric strong{font:700 1rem ui-monospace,SFMono-Regular,Menlo,monospace}.status{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82rem}.error{color:var(--danger)}.api-note{color:var(--muted);font-size:.82rem}
+    .code{white-space:pre-wrap;word-break:break-word}.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
     footer{padding:38px 0;color:var(--muted);font-size:.85rem}.footerrow{display:flex;flex-direction:column;gap:14px}
     :focus-visible{outline:3px solid var(--accent2);outline-offset:3px}
-    @media (min-width:700px){.wrap{width:min(calc(100% - 48px),var(--max))}.navlinks{display:flex}.menu{display:none}.hero{padding:120px 0 110px}.grid{grid-template-columns:repeat(3,1fr)}.proof{grid-template-columns:1fr 1fr}.footerrow{flex-direction:row;justify-content:space-between;align-items:center}}
+    @media (min-width:700px){.wrap{width:min(calc(100% - 48px),var(--max))}.navlinks{display:flex}.menu{display:none}.hero{padding:120px 0 110px}.grid{grid-template-columns:repeat(3,1fr)}.proof{grid-template-columns:1fr 1fr}.live{grid-template-columns:1.1fr .9fr}.markets{grid-template-columns:repeat(4,1fr)}.footerrow{flex-direction:row;justify-content:space-between;align-items:center}}
     @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
 </head>
@@ -32,7 +38,7 @@
   <nav class="wrap" aria-label="Primary">
     <a class="brand" href="#" aria-label="Vortex Corp home">VORTEX<span>.</span></a>
     <div class="navlinks">
-      <a href="#platform">Platform</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a><a href="https://github.com/scoobiii">GitHub</a>
+      <a href="#platform">Platform</a><a href="#markets">Markets</a><a href="#live">Live API</a><a href="#proof">ExecutionProof</a><a href="#enterprise">Enterprise</a>
     </div>
     <button class="menu" type="button" aria-label="Navigation menu">Menu</button>
   </nav>
@@ -40,31 +46,75 @@
 <main>
   <section class="hero">
     <div class="wrap">
-      <div class="eyebrow"><span class="dot"></span> Verifiable AI infrastructure</div>
+      <div class="eyebrow"><span class="dot"></span> Governed agent execution</div>
       <h1>AI agents that act.<br>Infrastructure that proves.</h1>
       <p class="lead">Vortex builds the execution layer for governed AI agents — connecting capabilities, policies and real-world actions with evidence you can verify.</p>
-      <div class="actions"><a class="btn primary" href="#platform">Explore the platform</a><a class="btn secondary" href="https://github.com/scoobiii/vortex">View the runtime</a></div>
+      <div class="actions"><a class="btn primary" href="#live">Run live execution</a><a class="btn secondary" href="https://github.com/scoobiii/vortex">View runtime</a><a class="btn secondary" href="https://github.com/scoobiii/vuc">VUA Connector</a></div>
     </div>
   </section>
+
+  <section id="markets">
+    <div class="wrap">
+      <div class="section-head"><div class="kicker">Markets</div><h2>Agent execution for real operations.</h2></div>
+      <div class="markets">
+        <div class="market"><strong>Financial Services</strong>banking, ERP, compliance</div>
+        <div class="market"><strong>Energy & Utilities</strong>CCEE, ERP, SCADA, billing</div>
+        <div class="market"><strong>Retail & Consumer</strong>inventory, pricing, supply chain</div>
+        <div class="market"><strong>Manufacturing</strong>operations, quality, maintenance</div>
+        <div class="market"><strong>Logistics</strong>orders, routing, fulfillment</div>
+        <div class="market"><strong>Healthcare</strong>workflow and governed systems</div>
+        <div class="market"><strong>Technology</strong>repositories, cloud, APIs</div>
+        <div class="market"><strong>Public Sector</strong>controlled digital operations</div>
+      </div>
+    </div>
+  </section>
+
   <section id="platform">
     <div class="wrap">
       <div class="section-head"><div class="kicker">Platform</div><h2>Execution with a chain of evidence.</h2></div>
       <div class="grid">
         <article class="card"><span class="tag">01 / Agents</span><h3>Act with boundaries</h3><p>Capabilities, identity, scope and policy sit around agent actions instead of after them.</p></article>
-        <article class="card"><span class="tag">02 / VUA + MCP</span><h3>Connect to systems</h3><p>A governed invocation layer for tools, repositories, adapters and external execution surfaces.</p></article>
+        <article class="card"><span class="tag">02 / VUA</span><h3>Call systems through APIs</h3><p>VUA provides the invocation layer for adapters, repositories and external execution surfaces.</p></article>
         <article class="card"><span class="tag">03 / Proof</span><h3>Leave evidence</h3><p>ExecutionProof makes an action inspectable and independently verifiable rather than merely asserted.</p></article>
       </div>
     </div>
   </section>
-  <section id="proof">
+
+  <section id="live">
     <div class="wrap">
-      <div class="section-head"><div class="kicker">ExecutionProof</div><h2>From “the agent says it happened” to evidence.</h2></div>
-      <div class="proof">
-        <div><p class="lead">The Vortex model is simple: an agent action should have a traceable request, governed execution and verifiable result.</p></div>
-        <div class="proofbox"><span class="ok">✓ verified</span><br>request → capability → policy<br>execution → artifact → hash<br>proof → independent verification</div>
+      <div class="section-head"><div class="kicker">Live API</div><h2>Realtime execution. Measured in the browser.</h2></div>
+      <div class="live">
+        <div class="live-panel">
+          <p class="lead">The page is static. The execution is not. The button below sends a real HTTP request to the configured Vortex Execution API and renders only the response it receives.</p>
+          <div class="actions"><button id="run-one" class="btn primary" type="button">Run one execution</button><button id="run-benchmark" class="btn secondary" type="button">Benchmark 10 calls</button></div>
+          <p id="api-status" class="status" aria-live="polite">API endpoint not configured.</p>
+          <p class="api-note">Configure <code>vortex-api-url</code>, <code>vortex-api-connector</code> and <code>vortex-api-operation</code> with the deployed Vortex/VUA contract. No execution result is generated by the page.</p>
+        </div>
+        <div class="live-panel">
+          <div class="live-grid">
+            <div class="metric"><span>Requests</span><strong id="m-requests">—</strong></div>
+            <div class="metric"><span>Verified</span><strong id="m-verified">—</strong></div>
+            <div class="metric"><span>p50</span><strong id="m-p50">—</strong></div>
+            <div class="metric"><span>p95</span><strong id="m-p95">—</strong></div>
+            <div class="metric"><span>p99</span><strong id="m-p99">—</strong></div>
+            <div class="metric"><span>Throughput</span><strong id="m-throughput">—</strong></div>
+          </div>
+          <pre id="proof-output" class="proofbox code">Waiting for a real API execution.</pre>
+        </div>
       </div>
     </div>
   </section>
+
+  <section id="proof">
+    <div class="wrap">
+      <div class="section-head"><div class="kicker">ExecutionProof</div><h2>From an agent claim to evidence.</h2></div>
+      <div class="proof">
+        <div><p class="lead">An action should have a traceable request, governed execution and independently checkable evidence.</p></div>
+        <div class="proofbox"><span class="ok">✓ verified when returned by the API</span><br>request → capability → policy<br>execution → artifact → hash<br>proof → independent verification</div>
+      </div>
+    </div>
+  </section>
+
   <section id="enterprise">
     <div class="wrap">
       <div class="section-head"><div class="kicker">Enterprise</div><h2>Governance belongs in the runtime.</h2></div>
@@ -73,9 +123,111 @@
         <article class="card"><h3>Audit</h3><p>Preserve evidence around actions, identities and outcomes.</p></article>
         <article class="card"><h3>Verification</h3><p>Separate execution claims from independently checkable proof.</p></article>
       </div>
+      <div class="cta"><a class="btn primary" href="https://github.com/scoobiii/vortex">Explore Vortex</a><a class="btn secondary" href="https://github.com/scoobiii/vua">Explore VUA</a><a class="btn secondary" href="https://github.com/scoobiii/vuc">Explore VUA Connector</a></div>
     </div>
   </section>
 </main>
 <footer><div class="wrap footerrow"><span>© 2026 Vortex Corp</span><span>Built for verifiable agent execution.</span></div></footer>
+
+<script>
+(() => {
+  "use strict";
+  const apiUrl = document.querySelector('meta[name="vortex-api-url"]')?.content.trim() || "";
+  const connectorId = document.querySelector('meta[name="vortex-api-connector"]')?.content.trim() || "";
+  const operation = document.querySelector('meta[name="vortex-api-operation"]')?.content.trim() || "";
+  const $ = (id) => document.getElementById(id);
+  const status = $("api-status");
+  const proof = $("proof-output");
+  const metric = (id, value) => $(id).textContent = value;
+
+  function requestPayload() {
+    if (!connectorId || !operation) throw new Error("Vortex API connector/operation is not configured.");
+    return {
+      request_id: "vortexcorp-" + crypto.randomUUID(),
+      connector_id: connectorId,
+      operation,
+      input: { repository: "scoobiii/VortexCorp" }
+    };
+  }
+
+  async function invoke() {
+    if (!apiUrl) throw new Error("Vortex API endpoint is not configured.");
+    const started = performance.now();
+    const response = await fetch(apiUrl.replace(/\/$/, "") + "/v1/invoke", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(requestPayload())
+    });
+    const elapsed = performance.now() - started;
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body?.error?.message || ("HTTP " + response.status));
+    return { body, elapsed };
+  }
+
+  function percentile(values, p) {
+    const sorted = [...values].sort((a,b) => a-b);
+    if (!sorted.length) return NaN;
+    const index = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
+    return sorted[index];
+  }
+
+  async function runOne() {
+    status.className = "status";
+    status.textContent = "Executing through Vortex API…";
+    proof.textContent = "Waiting for response…";
+    try {
+      const result = await invoke();
+      const body = result.body;
+      metric("m-requests", "1");
+      metric("m-verified", body.proof?.executed ? "1" : "0");
+      metric("m-p50", Math.round(result.elapsed) + " ms");
+      metric("m-p95", Math.round(result.elapsed) + " ms");
+      metric("m-p99", Math.round(result.elapsed) + " ms");
+      metric("m-throughput", "1 / " + Math.max(1, Math.round(result.elapsed)) + " ms");
+      proof.textContent = JSON.stringify(body, null, 2);
+      status.textContent = "Execution returned by Vortex API in " + Math.round(result.elapsed) + " ms.";
+    } catch (error) {
+      status.className = "status error";
+      status.textContent = error instanceof Error ? error.message : String(error);
+      proof.textContent = "No execution result received.";
+      ["m-requests","m-verified","m-p50","m-p95","m-p99","m-throughput"].forEach(id => metric(id, "—"));
+    }
+  }
+
+  async function benchmark() {
+    status.className = "status";
+    status.textContent = "Running 10 real API calls…";
+    proof.textContent = "Benchmark in progress…";
+    const values = [];
+    let verified = 0;
+    let lastBody = null;
+    try {
+      for (let i = 0; i < 10; i++) {
+        const result = await invoke();
+        values.push(result.elapsed);
+        lastBody = result.body;
+        if (result.body?.proof?.executed) verified++;
+        status.textContent = "Running 10 real API calls… " + (i + 1) + "/10";
+      }
+      const total = values.reduce((a,b) => a+b, 0);
+      metric("m-requests", String(values.length));
+      metric("m-verified", verified + "/" + values.length);
+      metric("m-p50", Math.round(percentile(values, 50)) + " ms");
+      metric("m-p95", Math.round(percentile(values, 95)) + " ms");
+      metric("m-p99", Math.round(percentile(values, 99)) + " ms");
+      metric("m-throughput", (values.length / (total / 1000)).toFixed(2) + " req/s");
+      proof.textContent = JSON.stringify({ benchmark: { requests: values.length, verified, latency_ms: values }, last_execution: lastBody }, null, 2);
+      status.textContent = "Benchmark complete: " + verified + "/" + values.length + " executions verified by the API.";
+    } catch (error) {
+      status.className = "status error";
+      status.textContent = error instanceof Error ? error.message : String(error);
+      proof.textContent = "Benchmark stopped because the API did not return a successful execution.";
+    }
+  }
+
+  $("run-one").addEventListener("click", runOne);
+  $("run-benchmark").addEventListener("click", benchmark);
+})();
+</script>
 </body>
 </html>
