@@ -7,6 +7,8 @@
   <meta name="theme-color" content="#08090b">
   <meta name="vortex-runtime-repo" content="scoobiii/vuc">
   <meta name="vortex-runtime-workflow" content="vortex-ci.yml">
+  <!-- Optional public read-only proof verifier. Leave empty until a real endpoint is provisioned. -->
+  <meta name="vortex-proof-api" content="">
   <title>Vortex Corp — Verifiable AI infrastructure</title>
   <style>
     :root{--bg:#08090b;--panel:#101216;--panel2:#15181e;--text:#f5f7fa;--muted:#9ba3af;--line:#262b34;--accent:#8ef0c5;--accent2:#79a7ff;--danger:#ff8f8f;--max:1160px}
@@ -125,13 +127,22 @@
         <div class="live-panel">
           <div class="live-grid">
             <div class="metric"><span>Observed runs</span><strong id="m-requests">—</strong></div>
-            <div class="metric"><span>Successful</span><strong id="m-verified">—</strong></div>
+            <div class="metric"><span>Successful</span><strong id="m-success">—</strong></div>
+            <div class="metric"><span>Failed</span><strong id="m-failed">—</strong></div>
+            <div class="metric"><span>Skipped</span><strong id="m-skipped">—</strong></div>
+            <div class="metric"><span>Pass rate</span><strong id="m-passrate">—</strong></div>
             <div class="metric"><span>Run p50</span><strong id="m-p50">—</strong></div>
             <div class="metric"><span>Run p95</span><strong id="m-p95">—</strong></div>
-            <div class="metric"><span>Run p99</span><strong id="m-p99">—</strong></div>
-            <div class="metric"><span>Latest</span><strong id="m-throughput">—</strong></div>
+            <div class="metric"><span>Latest</span><strong id="m-latest">—</strong></div>
           </div>
-          <pre id="proof-output" class="proofbox code">Waiting for a real API execution.</pre>
+          <div class="proofbox">
+            <div><span>CI</span> <strong id="ci-signal">UNVERIFIED</strong></div>
+            <div><span>ExecutionProof</span> <strong id="proof-signal">UNVERIFIED</strong></div>
+            <div><span>Signature</span> <strong id="signature-signal">UNVERIFIED</strong></div>
+            <div><span>Hash</span> <strong id="hash-signal">UNVERIFIED</strong></div>
+            <div><span>Identity</span> <strong id="identity-signal">UNVERIFIED</strong></div>
+          </div>
+          <pre id="proof-output" class="proofbox code">Waiting for real evidence.</pre>
         </div>
       </div>
     </div>
@@ -166,19 +177,20 @@
   "use strict";
   const repo = document.querySelector('meta[name="vortex-runtime-repo"]')?.content.trim() || "scoobiii/vuc";
   const workflow = document.querySelector('meta[name="vortex-runtime-workflow"]')?.content.trim() || "vortex-ci.yml";
+  const proofApi = document.querySelector('meta[name="vortex-proof-api"]')?.content.trim() || "";
   const api = "https://api.github.com/repos/" + repo;
   const $ = id => document.getElementById(id);
-  const metric = (id, value) => $(id).textContent = value;
+  const metric = (id, value) => { const el=$(id); if(el) el.textContent=value; };
   const status = $("api-status");
   const proof = $("proof-output");
 
-  async function getJson(path) {
-    const response = await fetch(api + path, {
+  async function getJson(url) {
+    const response = await fetch(url, {
       headers: { "accept": "application/vnd.github+json" },
       cache: "no-store"
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.message || ("GitHub API HTTP " + response.status));
+    if (!response.ok) throw new Error(body.message || ("HTTP " + response.status));
     return body;
   }
 
@@ -187,67 +199,97 @@
     return Math.max(0, new Date(run.updated_at) - new Date(run.run_started_at));
   }
 
+  function percentile(values, p) {
+    if (!values.length) return null;
+    const sorted=values.slice().sort((a,b)=>a-b);
+    return sorted[Math.min(sorted.length-1, Math.ceil(sorted.length*p)-1)];
+  }
+
   async function refresh() {
     status.className = "status";
-    status.textContent = "Reading GitHub Actions runtime…";
+    status.textContent = "Reading live CI and evidence sources…";
     try {
-      const [runs, workflowInfo, artifacts] = await Promise.all([
-        getJson("/actions/runs?per_page=10"),
-        getJson("/actions/workflows/" + encodeURIComponent(workflow)),
-        getJson("/actions/artifacts?per_page=20")
+      const [runs, workflowInfo] = await Promise.all([
+        getJson(api + "/actions/runs?per_page=20"),
+        getJson(api + "/actions/workflows/" + encodeURIComponent(workflow))
       ]);
-      const relevant = (runs.workflow_runs || []).filter(r => r.path === ".github/workflows/" + workflow || r.name === workflowInfo.name);
-      const list = relevant.length ? relevant : (runs.workflow_runs || []);
+      const allRuns = runs.workflow_runs || [];
+      const relevant = allRuns.filter(r =>
+        r.path === ".github/workflows/" + workflow || r.name === workflowInfo.name
+      );
+      const list = relevant.length ? relevant : allRuns;
+      if (!list.length) throw new Error("No GitHub Actions execution found.");
+
       const latest = list[0];
-      if (!latest) throw new Error("No GitHub Actions execution found.");
+      const completed = list.filter(r => r.status === "completed");
+      const success = completed.filter(r => r.conclusion === "success").length;
+      const failed = completed.filter(r => r.conclusion === "failure").length;
+      const skipped = completed.filter(r => ["skipped","cancelled","neutral"].includes(r.conclusion)).length;
       const durations = list.map(duration).filter(v => v !== null);
-      const successCount = list.filter(r => r.conclusion === "success").length;
-      const evidence = (artifacts.artifacts || []).find(a => a.name === "vortex-execution-evidence" && !a.expired);
+      const passRate = completed.length ? ((success / completed.length) * 100).toFixed(1) + "%" : "UNVERIFIED";
+
       metric("m-requests", String(list.length));
-      metric("m-verified", successCount + "/" + list.length);
-      metric("m-p50", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.floor((durations.length-1)*.5)]) + " ms" : "—");
-      metric("m-p95", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.min(durations.length-1,Math.ceil(durations.length*.95)-1)]) + " ms" : "—");
-      metric("m-p99", durations.length ? Math.round(durations.slice().sort((a,b)=>a-b)[Math.min(durations.length-1,Math.ceil(durations.length*.99)-1)]) + " ms" : "—");
-      metric("m-throughput", latest.status === "completed" ? latest.conclusion || "completed" : latest.status);
+      metric("m-success", success + "/" + completed.length);
+      metric("m-failed", String(failed));
+      metric("m-skipped", String(skipped));
+      metric("m-passrate", passRate);
+      metric("m-p50", percentile(durations,.50) === null ? "—" : Math.round(percentile(durations,.50)) + " ms");
+      metric("m-p95", percentile(durations,.95) === null ? "—" : Math.round(percentile(durations,.95)) + " ms");
+      metric("m-latest", latest.status + (latest.conclusion ? " / " + latest.conclusion : ""));
+
+      metric("ci-signal", latest.status === "completed" && latest.conclusion === "success" ? "PASS" : "UNVERIFIED");
+      metric("proof-signal", "UNVERIFIED");
+      metric("signature-signal", "UNVERIFIED");
+      metric("hash-signal", "UNVERIFIED");
+      metric("identity-signal", "UNVERIFIED");
+
+      let verifier = {configured:false};
+      if (proofApi) {
+        verifier = await getJson(proofApi + "?repo=" + encodeURIComponent(repo) + "&run_id=" + encodeURIComponent(latest.id));
+        metric("proof-signal", verifier.verified_execution_proof === true ? "VERIFIED" : "UNVERIFIED");
+        metric("signature-signal", verifier.ed25519_signature_verified === true ? "VERIFIED" : "UNVERIFIED");
+        metric("hash-signal", verifier.proof_hash_match === true ? "MATCH" : "UNVERIFIED");
+        metric("identity-signal", verifier.identity_verified === true ? "VERIFIED" : "UNVERIFIED");
+      }
+
       proof.textContent = JSON.stringify({
-        runtime: "github-actions-sandbox",
-        workflow: workflowInfo.name,
-        evidence_artifact: evidence ? {
-          id: evidence.id,
-          name: evidence.name,
-          size_in_bytes: evidence.size_in_bytes,
-          created_at: evidence.created_at,
-          expires_at: evidence.expires_at
-        } : null,
-        latest_execution: {
-          id: latest.id,
-          status: latest.status,
-          conclusion: latest.conclusion,
-          event: latest.event,
+        source: {
+          github_actions: true,
+          proof_verifier_configured: verifier.configured !== false && Boolean(proofApi)
+        },
+        ci: {
+          workflow: workflowInfo.name,
+          observed_runs: list.length,
+          completed_runs: completed.length,
+          successful: success,
+          failed,
+          skipped,
+          pass_rate: passRate,
+          latest_run_id: latest.id,
+          latest_status: latest.status,
+          latest_conclusion: latest.conclusion,
           sha: latest.head_sha,
-          started_at: latest.run_started_at,
-          updated_at: latest.updated_at,
           html_url: latest.html_url
         },
-        evidence_url: evidence ? "https://github.com/" + repo + "/actions/runs/" + latest.id : null,
-        observed_runs: list.map(r => ({
-          id: r.id, status: r.status, conclusion: r.conclusion,
-          event: r.event, sha: r.head_sha, created_at: r.created_at,
-          updated_at: r.updated_at, html_url: r.html_url
-        }))
+        execution_proof: proofApi ? verifier : {
+          status: "UNVERIFIED",
+          reason: "No public proof-verifier endpoint configured. CI success is not treated as cryptographic proof."
+        }
       }, null, 2);
-      status.textContent = "Live runtime read: " + latest.status + (latest.conclusion ? " / " + latest.conclusion : "") + ".";
+
+      status.textContent = "Live read: GitHub Actions " + latest.status + (latest.conclusion ? " / " + latest.conclusion : "") + ". Proof is fail-closed.";
     } catch (error) {
       status.className = "status error";
       status.textContent = error instanceof Error ? error.message : String(error);
-      proof.textContent = "No live runtime evidence received.";
-      ["m-requests","m-verified","m-p50","m-p95","m-p99","m-throughput"].forEach(id => metric(id, "—"));
+      ["m-requests","m-success","m-failed","m-skipped","m-passrate","m-p50","m-p95","m-latest",
+       "ci-signal","proof-signal","signature-signal","hash-signal","identity-signal"].forEach(id => metric(id, "UNVERIFIED"));
+      proof.textContent = "No live evidence received. Status is UNVERIFIED.";
     }
   }
 
   $("run-benchmark").addEventListener("click", refresh);
   refresh();
 })();
-</script>
+</script>>
 </body>
 </html>
